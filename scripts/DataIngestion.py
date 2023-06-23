@@ -7,7 +7,8 @@ import logging
 import warnings
 warnings.filterwarnings('ignore')
 
-logging.basicConfig(level = logging.INFO, filename = 'logs/execution.log', format = '')
+logging.basicConfig(level = logging.INFO,
+                    format = '%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s')
 
 class DataIngestion:
     """
@@ -140,13 +141,14 @@ class DataIngestion:
             for i in range(1, 24):
                 
                 link = f'{url}{i}'
-                web_data = pd.read_html(link)
+                logging.info('Scrapping data from: %s', link)
+                web_data = pd.read_html(link)[0]
                 
                 data = pd.concat([data, web_data])
             logging.info('Scrapping realised correctly and saved into dataframe.')
             return data
-        except:
-            logging.error('Scrapping was not executed correctly.')
+        except Exception as e:
+            logging.error('An error occurred during scraping: %s', str(e))
             return None
     
     def prepare_web_data(self, data: pd.DataFrame()) -> pd.DataFrame():
@@ -207,9 +209,11 @@ if __name__ == "__main__":
     di.save_data(file_path = 'data/base_consolidada/base_consolidada2.parquet',
                  data = merged_data)
     data = di.scrapping(url = 'https://www.detran.mg.gov.br/infracoes/consultar-tipos-infracoes/index/index/index/index/index/index/index/index/index/index/index/index/index/lista-de-infracoes?artigo=&descricao=&page=')
-    price_table = di.prepare_web_data(data = data)
-    merged_full_data = di.concat_data(merged_data = merged_data, price_table = price_table)
-    di.save_data(file_path = 'data/base_consolidada/base_consolidada_scraped.parquet',
+    if data is not None:
+        price_table = di.prepare_web_data(data = data)
+        if price_table is not None:
+            merged_full_data = di.concat_data(merged_data = merged_data, price_table = price_table)
+            di.save_data(file_path = 'data/base_consolidada/base_consolidada_scraped.parquet',
                  data = merged_full_data)
     
     
