@@ -6,8 +6,8 @@ import plotly.graph_objects as go
 import pandas as pd
 
 # Read the data
-Base_Dados = pd.read_csv('data/Dados_Diários.csv')
-Base_Valor = pd.read_csv('data/Dados_Mes_Valor.csv')
+Base_Dados = pd.read_csv('../data/Dados_Diários.csv')
+Base_Valor = pd.read_csv('../data/Dados_Mes_Valor.csv')
 Base_Valor.columns = ['Mes', 'Quantidade']
 
 # Create the Dash app
